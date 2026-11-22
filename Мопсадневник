@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>МопсоДневник</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fdf6ec;
+    --card: #ffffff;
+    --ink: #3a2a20;
+    --muted: #8a7566;
+    --caramel: #d59a5f;
+    --line: #efe0cf;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--bg);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cg fill='%23f0dfcb'%3E%3Cellipse cx='22' cy='28' rx='7' ry='6'/%3E%3Cellipse cx='15' cy='17' rx='3' ry='4'/%3E%3Cellipse cx='22' cy='14' rx='3' ry='4'/%3E%3Cellipse cx='29' cy='17' rx='3' ry='4'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 128px 128px;
+    color: var(--ink);
+    font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: 'Comfortaa', 'Nunito', system-ui, sans-serif; margin: 0; }
+  p { margin: 0; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 64px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: 0 18px 40px -28px rgba(91, 63, 46, 0.45);
+  }
+  .muted { color: var(--muted); }
+  .label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: block; }
+  .hint { margin-top: 14px; font-size: 12px; color: var(--muted); }
+
+  /* вход */
+  .login { max-width: 560px; }
+  .hero { text-align: center; padding: 24px 0 20px; }
+  .hero-emoji { font-size: 44px; }
+  .hero h1 { font-size: 32px; margin-top: 8px; }
+  .hero p { margin-top: 8px; font-size: 14px; }
+  .people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
+  .person {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 10px 6px; border-radius: 18px; border: 1px solid var(--line);
+    background: #fff; color: var(--ink); font-family: inherit; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: border-color .2s, background .2s, transform .2s;
+  }
+  .person:hover { border-color: var(--caramel); transform: translateY(-2px); }
+  .person.active { border-color: var(--caramel); background: #fdf1e2; }
+  .person-emoji { font-size: 20px; }
+  .person small { font-size: 10px; font-weight: 600; color: var(--muted); }
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+  input, textarea, select {
+    width: 100%; font-family: inherit; font-size: 14px; color: var(--ink);
+    padding: 12px 14px; border-radius: 16px; border: 1px solid var(--line);
+    background: #fff; outline: none;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--caramel); box-shadow: 0 0 0 4px rgba(213, 154, 95, .18); }
+  textarea { resize: vertical; min-height: 96px; line-height: 1.5; }
+  .btn {
+    font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+    padding: 13px 18px; border-radius: 16px; border: none;
+    background: var(--ink); color: #fdf6ec; transition: opacity .2s;
+  }
+  .btn:hover { opacity: .9; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn-ghost {
+    background: #fff; color: var(--muted); border: 1px solid var(--line);
+    font-size: 12px; padding: 8px 14px; border-radius: 999px;
+  }
+  .error { font-size: 13px; font-weight: 700; color: #b4453a; background: #fbeae7; padding: 10px 12px; border-radius: 12px; }
+
+  /* шапка */
+  .top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 18px; }
+  .brand span:first-child { font-size: 22px; }
+  .top .spacer { flex: 1; }
+  .who { font-size: 13px; color: var(--muted); }
+  .who b { color: var(--ink); }
+
+  .greeting {
+    border-radius: 26px; padding: 22px;
+    background: linear-gradient(135deg, #fbe9d3, #ffffff 70%);
+    border: 1px solid var(--line);
+    box-shadow: 0 18px 40px -30px rgba(91, 63, 46, .45);
+  }
+  .greeting h1 { font-size: 26px; margin-top: 6px; }
+  .greeting p { margin-top: 8px; font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+  .tabs { display: inline-flex; gap: 4px; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 4px; margin: 16px 0; }
+  .tab { font-family: inherit; font-size: 13px; font-weight: 700; border: none; background: transparent; color: var(--muted); padding: 8px 16px; border-radius: 999px; cursor: pointer; }
+  .tab.active { background: var(--ink); color: #fdf6ec; }
+
+  .grid { display: grid; gap: 16px; }
+  @media (min-width: 860px) { .grid.two { grid-template-columns: 1fr 1fr; align-items: start; } }
+  .section-title { font-size: 15px; font-family: 'Comfortaa', sans-serif; margin-bottom: 14px; }
+
+  .chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .chip {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 8px 4px; border-radius: 16px; border: 1px solid var(--line);
+    background: #fff; color: var(--muted); font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .chip.active { border-color: var(--caramel); background: #fdf1e2; color: var(--ink); }
+  .chip span:first-child { font-size: 18px; }
+
+  .values { display: flex; flex-wrap: wrap; gap: 8px; }
+  .value {
+    width: 48px; height: 48px; border-radius: 16px; border: none; cursor: pointer;
+    font-family: 'Comfortaa', sans-serif; font-size: 20px; font-weight: 700; color: #fff;
+  }
+  .value.active { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  .g1 { background: #c25b4e; }
+  .g2 { background: #d97b4f; }
+  .g3 { background: #d9a548; }
+  .g4 { background: #c9b24d; }
+  .g5 { background: #7ea75c; }
+  .g6 { background: #4f9166; }
+
+  .row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 18px; background: #fff; }
+  .row + .row { margin-top: 8px; }
+  .badge {
+    width: 38px; height: 38px; flex: 0 0 38px; border-radius: 13px; display: flex; align-items: center; justify-content: center;
+    font-family: 'Comfortaa', sans-serif; font-size: 17px; font-weight: 700; color: #fff;
+  }
+  .row-body { min-width: 0; flex: 1; }
+  .row-title { font-size: 13px; font-weight: 700; }
+  .row-sub { font-size: 12px; color: var(--muted); margin-top: 2px; word-break: break-word; }
+  .del {
+    width: 30px; height: 30px; flex: 0 0 30px; border-radius: 999px; border: none; background: transparent;
+    color: var(--muted); font-size: 16px; line-height: 1; cursor: pointer;
+  }
+  .del:hover { background: #fbeae7; color: #b4453a; }
+
+  .hw { border: 1px solid var(--line); border-radius: 18px; background: #fff; padding: 14px; }
+  .hw + .hw { margin-top: 10px; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: #fbe9d3; color: #7a5b3f; border-radius: 999px; padding: 4px 10px; }
+  .hw-text { margin-top: 8px; font-size: 14px; line-height: 1.55; white-space: pre-line; }
+  .hw-meta { margin-top: 10px; font-size: 12px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .stats { display: flex; gap: 10px; margin-bottom: 16px; }
+  .stat { flex: 1; border: 1px solid var(--line); border-radius: 18px; background: #fff; padding: 12px 14px; }
+  .stat b { display: block; font-family: 'Comfortaa', sans-serif; font-size: 22px; }
+  .stat span { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+
+  .empty { border: 1px dashed var(--line); border-radius: 18px; padding: 26px 14px; text-align: center; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+  /* ── Кто есть в дневнике. Пароли можно поменять здесь ───────────── */
+  var PEOPLE = [
+    { login: 'ilya', name: 'Илья', emoji: '📘', role: 'teacher', password: '1234' },
+    { login: 'makar', name: 'Макар', emoji: '✏️', role: 'teacher', password: '1234' },
+    { login: 'timofey', name: 'Тимофей', emoji: '🐶', role: 'student', password: '1234' },
+    { login: 'tihon', name: 'Тихон', emoji: '🐕', role: 'student', password: '1234' },
+    { login: 'misha', name: 'Миша', emoji: '🐩', role: 'student', password: '1234' }
+  ];
+
+  var SUBJECT = 'Мопсий язык';
+  var STUDENTS = PEOPLE.filter(function (p) { return p.role === 'student'; });
+  var GRADES_KEY = 'mops_grades';
+  var HOMEWORK_KEY = 'mops_homework';
+  var SESSION_KEY = 'mops_session';
+
+  var app = document.getElementById('app');
+  var session = loadSession();
+  var tab = 'grades';
+  var loginPick = PEOPLE[0].login;
+  var pickedStudent = STUDENTS[0].login;
+  var pickedGrade = null;
+
+  function loadSession() {
+    try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch (e) { return null; }
+  }
+  function saveSession(value) {
+    if (value) localStorage.setItem(SESSION_KEY, JSON.stringify(value));
+    else localStorage.removeItem(SESSION_KEY);
+  }
+  function readList(key) {
+    try {
+      var raw = JSON.parse(localStorage.getItem(key));
+      return Array.isArray(raw) ? raw : [];
+    } catch (e) { return []; }
+  }
+  function writeList(key, list) { localStorage.setItem(key, JSON.stringify(list)); }
+  function uid() { return String(Date.now()) + Math.random().toString(16).slice(2, 7); }
+  function todayIso() { return new Date().toISOString().slice(0, 10); }
+  function formatDate(value) {
+    if (!value) return '';
+    var date = new Date(value);
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+  }
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+  function personByLogin(login) {
+    return PEOPLE.find(function (p) { return p.login === login; }) || null;
+  }
+  function byNewest(a, b) { return (b.created || 0) - (a.created || 0); }
+
+  /* ── Вход ───────────────────────────────────────────────────────── */
+  function renderLogin() {
+    app.innerHTML =
+      '<div class="wrap login">' +
+        '<div class="hero">' +
+          '<div class="hero-emoji">🐾</div>' +
+          '<h1>МопсоДневник</h1>' +
+          '<p class="muted">Оценки и домашка по предмету «' + SUBJECT + '»</p>' +
+        '</div>' +
+        '<div class="card">' +
+          '<span class="label">Кто ты?</span>' +
+          '<div class="people">' +
+            PEOPLE.map(function (p) {
+              return '<button class="person" type="button" data-login="' + p.login + '">' +
+                '<span class="person-emoji">' + p.emoji + '</span>' +
+                '<span>' + p.name + '</span>' +
+                '<small>' + (p.role === 'teacher' ? 'учитель' : 'ученик') + '</small>' +
+              '</button>';
+            }).join('') +
+          '</div>' +
+          '<form id="loginForm" class="stack">' +
+            '<label class="label" for="password">Пароль</label>' +
+            '<input id="password" type="password" autocomplete="off" placeholder="Введи пароль" />' +
+            '<p id="loginError" class="error" hidden></p>' +
+            '<button class="btn" type="submit">Войти</button>' +
+          '</form>' +
+          '<p class="hint">Пароль по умолчанию — <b>1234</b>. Поменять его можно в начале файла.</p>' +
+        '</div>' +
+      '</div>';
+
+    var buttons = app.querySelectorAll('.person');
+    function syncPick() {
+      buttons.forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.login === loginPick);
+      });
+    }
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () { loginPick = btn.dataset.login; syncPick(); });
+    });
+    syncPick();
+
+    app.querySelector('#loginForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      var person = personByLogin(loginPick);
+      var input = app.querySelector('#password');
+      var error = app.querySelector('#loginError');
+      if (!person || input.value.trim() !== person.password) {
+        error.textContent = 'Пароль не подошёл 🐾 попробуй ещё раз';
+        error.hidden = false;
+        return;
+      }
+      session = { login: person.login, name: person.name, role: person.role, emoji: person.emoji };
+      saveSession(session);
+      tab = 'grades';
+      pickedGrade = null;
+      render();
+    });
+  }
+
+  /* ── Общие кусочки интерфейса ───────────────────────────────────── */
+  function gradeRow(grade, showStudent, canDelete) {
+    var student = personByLogin(grade.student_login);
+    var title = showStudent && student ? student.name : grade.subject;
+    var sub = formatDate(grade.date) + ' · ' + (grade.teacher_name || 'учитель');
+    if (grade.comment) sub += ' · ' + grade.comment;
+    return '<div class="row">' +
+      '<div class="badge g' + grade.value + '">' + grade.value + '</div>' +
+      '<div class="row-body">' +
+        '<div class="row-title">' + escapeHtml(title) + '</div>' +
+        '<div class="row-sub">' + escapeHtml(sub) + '</div>' +
+      '</div>' +
+      (canDelete ? '<button class="del" type="button" data-del-grade="' + grade.id + '" title="Удалить">✕</button>' : '') +
+    '</div>';
+  }
+
+  function homeworkCard(item, canDelete) {
+    return '<div class="hw">' +
+      '<div style="display:flex;align-items:flex-start;gap:10px">' +
+        '<div style="flex:1;min-width:0">' +
+          '<span class="tag">' + escapeHtml(item.subject) + '</span>' +
+          '<p class="hw-text">' + escapeHtml(item.task) + '</p>' +
+          '<div class="hw-meta">' +
+            (item.due_date ? '<span>сдать к ' + escapeHtml(formatDate(item.due_date)) + '</span>' : '') +
+            '<span>' + escapeHtml(item.teacher_name || 'учитель') + '</span>' +
+          '</div>' +
+        '</div>' +
+        (canDelete ? '<button class="del" type="button" data-del-hw="' + item.id + '" title="Удалить">✕</button>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  function header() {
+    return '<div class="top">' +
+      '<div class="brand"><span>🐾</span><span>МопсоДневник</span></div>' +
+      '<div class="spacer"></div>' +
+      '<span class="who">' + session.emoji + ' <b>' + escapeHtml(session.name) + '</b> · ' + (session.role === 'teacher' ? 'учитель' : 'ученик') + '</span>' +
+      '<button class="btn-ghost" type="button" id="logout">Выйти</button>' +
+    '</div>';
+  }
+
+  /* ── Дневник ────────────────────────────────────────────────────── */
+  function renderDiary() {
+    var isTeacher = session.role === 'teacher';
+    var grades = readList(GRADES_KEY).sort(byNewest);
+    var homework = readList(HOMEWORK_KEY).sort(byNewest);
+    var myGrades = grades.filter(function (g) { return g.student_login === session.login; });
+
+    var html = '<div class="wrap">' + header();
+
+    html += '<div class="greeting">' +
+      '<p class="label">' + escapeHtml(new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p>' +
+      '<h1>Привет, ' + escapeHtml(session.name) + '!</h1>' +
+      '<p>' + (isTeacher
+        ? 'Тут ты ставишь оценки и публикуешь домашку — ребята увидят её сразу.'
+        : 'Смотри свои оценки и не забудь про домашнее задание.') + '</p>' +
+    '</div>';
+
+    if (isTeacher) {
+      html += '<div class="tabs">' +
+        '<button class="tab' + (tab === 'grades' ? ' active' : '') + '" type="button" data-tab="grades">Оценки</button>' +
+        '<button class="tab' + (tab === 'homework' ? ' active' : '') + '" type="button" data-tab="homework">Домашка</button>' +
+      '</div>';
+
+      if (tab === 'grades') {
+        html += '<div class="grid two">' +
+          '<div class="card">' +
+            '<h2 class="section-title">Новая оценка</h2>' +
+            '<span class="label">Ученик</span>' +
+            '<div class="chips">' +
+              STUDENTS.map(function (s) {
+                return '<button class="chip' + (pickedStudent === s.login ? ' active' : '') + '" type="button" data-student="' + s.login + '">' +
+                  '<span>' + s.emoji + '</span><span>' + s.name + '</span></button>';
+              }).join('') +
+            '</div>' +
+            '<div style="margin-top:16px">' +
+              '<span class="label">Оценка · ' + SUBJECT + '</span>' +
+              '<div class="values">' +
+                [1, 2, 3, 4, 5, 6].map(function (v) {
+                  return '<button class="value g' + v + (pickedGrade === v ? ' active' : '') + '" type="button" data-value="' + v + '">' + v + '</button>';
+                }).join('') +
+              '</div>' +
+            '</div>' +
+            '<div style="margin-top:16px">' +
+              '<span class="label">Комментарий (необязательно)</span>' +
+              '<input id="comment" type="text" placeholder="Например: отлично решил задачу" />' +
+            '</div>' +
+            '<button class="btn" type="button" id="saveGrade" style="margin-top:16px;width:100%"' + (pickedGrade ? '' : ' disabled') + '>Поставить оценку</button>' +
+          '</div>' +
+          '<div class="card">' +
+            '<h2 class="section-title">Последние оценки</h2>' +
+            (grades.length
+              ? grades.map(function (g) { return gradeRow(g, true, true); }).join('')
+              : '<div class="empty">Оценок пока нет</div>') +
+          '</div>' +
+        '</div>';
+      } else {
+        html += '<div class="grid two">' +
+          '<div class="card">' +
+            '<h2 class="section-title">Новое задание</h2>' +
+            '<span class="label">Что задано · ' + SUBJECT + '</span>' +
+            '<textarea id="hwTask" placeholder="Например: страница 24, упражнения 5 и 6"></textarea>' +
+            '<div style="margin-top:12px">' +
+              '<span class="label">Сдать к</span>' +
+              '<input id="hwDate" type="date" value="' + todayIso() + '" />' +
+            '</div>' +
+            '<p id="hwError" class="error" style="margin-top:12px" hidden></p>' +
+            '<button class="btn" type="button" id="saveHw" style="margin-top:16px;width:100%">Опубликовать домашку</button>' +
+          '</div>' +
+          '<div class="card">' +
+            '<h2 class="section-title">Опубликованная домашка</h2>' +
+            (homework.length
+              ? homework.map(function (item) { return homeworkCard(item, true); }).join('')
+              : '<div class="empty">Ты пока ничего не задал</div>') +
+          '</div>' +
+        '</div>';
+      }
+    } else {
+      var sum = myGrades.reduce(function (acc, g) { return acc + Number(g.value || 0); }, 0);
+      var average = myGrades.length ? (sum / myGrades.length).toFixed(1) : '—';
+
+      html += '<div class="grid two" style="margin-top:16px">' +
+        '<div class="card">' +
+          '<h2 class="section-title">Мои оценки</h2>' +
+          '<div class="stats">' +
+            '<div class="stat"><b>' + average + '</b><span>средний балл</span></div>' +
+            '<div class="stat"><b>' + myGrades.length + '</b><span>оценок</span></div>' +
+          '</div>' +
+          (myGrades.length
+            ? myGrades.map(function (g) { return gradeRow(g, false, false); }).join('')
+            : '<div class="empty">Тебе ещё не поставили оценок</div>') +
+        '</div>' +
+        '<div class="card">' +
+          '<h2 class="section-title">Домашнее задание</h2>' +
+          (homework.length
+            ? homework.map(function (item) { return homeworkCard(item, false); }).join('')
+            : '<div class="empty">Домашки пока нет — можно отдыхать 🐾</div>') +
+        '</div>' +
+      '</div>';
+    }
+
+    html += '</div>';
+    app.innerHTML = html;
+    attachDiaryHandlers();
+  }
+
+  function attachDiaryHandlers() {
+    var logout = app.querySelector('#logout');
+    if (logout) {
+      logout.addEventListener('click', function () {
+        session = null;
+        saveSession(null);
+        render();
+      });
+    }
+
+    app.querySelectorAll('[data-tab]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        tab = btn.dataset.tab;
+        render();
+      });
+    });
+
+    app.querySelectorAll('[data-student]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        pickedStudent = btn.dataset.student;
+        render();
+      });
+    });
+
+    app.querySelectorAll('[data-value]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        pickedGrade = Number(btn.dataset.value);
+        render();
+      });
+    });
+
+    var saveGrade = app.querySelector('#saveGrade');
+    if (saveGrade) {
+      saveGrade.addEventListener('click', function () {
+        var student = personByLogin(pickedStudent);
+        if (!student || !pickedGrade) return;
+        var commentInput = app.querySelector('#comment');
+        var grades = readList(GRADES_KEY);
+        grades.push({
+          id: uid(),
+          created: Date.now(),
+          student_login: student.login,
+          student_name: student.name,
+          subject: SUBJECT,
+          value: pickedGrade,
+          comment: commentInput ? commentInput.value.trim() : '',
+          teacher_login: session.login,
+          teacher_name: session.name,
+          date: todayIso()
+        });
+        writeList(GRADES_KEY, grades);
+        pickedGrade = null;
+        render();
+      });
+    }
+
+    var saveHw = app.querySelector('#saveHw');
+    if (saveHw) {
+      saveHw.addEventListener('click', function () {
+        var taskInput = app.querySelector('#hwTask');
+        var dateInput = app.querySelector('#hwDate');
+        var error = app.querySelector('#hwError');
+        var task = taskInput ? taskInput.value.trim() : '';
+        if (!task) {
+          error.textContent = 'Напиши, что задано';
+          error.hidden = false;
+          return;
+        }
+        var homework = readList(HOMEWORK_KEY);
+        homework.push({
+          id: uid(),
+          created: Date.now(),
+          subject: SUBJECT,
+          task: task,
+          due_date: (dateInput && dateInput.value) || todayIso(),
+          teacher_login: session.login,
+          teacher_name: session.name
+        });
+        writeList(HOMEWORK_KEY, homework);
+        render();
+      });
+    }
+
+    app.querySelectorAll('[data-del-grade]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.dataset.delGrade;
+        writeList(GRADES_KEY, readList(GRADES_KEY).filter(function (g) { return g.id !== id; }));
+        render();
+      });
+    });
+
+    app.querySelectorAll('[data-del-hw]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.dataset.delHw;
+        writeList(HOMEWORK_KEY, readList(HOMEWORK_KEY).filter(function (h) { return h.id !== id; }));
+        render();
+      });
+    });
+  }
+
+  function render() {
+    if (session) renderDiary();
+    else renderLogin();
+  }
+
+  render();
+</script>
+</body>
+</html>
